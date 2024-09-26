@@ -13,7 +13,7 @@ class Skeleton extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               margin: const EdgeInsets.all(5),
               height: 80,
-              width: 300,
+              width: 330,
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 220, 220, 220),
                 borderRadius: BorderRadius.circular(5),
@@ -28,7 +28,7 @@ class Skeleton extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               margin: const EdgeInsets.all(5),
               height: 80,
-              width: 300,
+              width: 330,
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 220, 220, 220),
                 borderRadius: BorderRadius.circular(10),
@@ -42,7 +42,7 @@ class Skeleton extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               margin: const EdgeInsets.all(5),
               height: 80,
-              width: 300,
+              width: 330,
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 220, 220, 220),
                 borderRadius: BorderRadius.circular(2),
@@ -57,7 +57,7 @@ class Skeleton extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               margin: const EdgeInsets.all(5),
               height: 80,
-              width: 300,
+              width: 330,
               decoration: BoxDecoration(
                 color: const Color.fromARGB(255, 220, 220, 220),
                 borderRadius: BorderRadius.circular(10),

@@ -1,30 +1,125 @@
 import 'package:flutter/material.dart';
 import 'package:translate_ipssi/services/groq.dart';
+import 'package:translate_ipssi/widgets/navigationBar.dart';
+import 'package:translate_ipssi/widgets/skeleton.dart';
 
 class MyTranslatePage extends StatefulWidget {
   const MyTranslatePage({super.key});
-  
+
   @override
   State<MyTranslatePage> createState() => _MyTranslatePageState();
 }
 
 class _MyTranslatePageState extends State<MyTranslatePage> {
-  final List<String> _languages = ['Anglais', 'Français', 'Espagnol', 'Arabe', 'Chinois'];//Liste de langue dispo
-  String _selectedLanguage = 'Anglais';//langue selectionné
-  final List<Map<String, String>> _messages = [];//Messages enregistré (utilistaeur et IA)
+  final List<String> _languages = [
+    'Anglais',
+    'Français',
+    'Espagnol',
+    'Arabe',
+    'Chinois'
+  ];
 
-  final TextEditingController _textController = TextEditingController();// recuperer l'input de l'utilisateur
+  String _selectedLanguage = 'Anglais';
+  final List<Map<String, String>> _messages = [];
 
-  Future<dynamic> getData() async {
-    dynamic groqService = await GroqService().getData();
-    return groqService;
+  final TextEditingController textController = TextEditingController();
+
+  Future<dynamic> getTranslationData() async {
+    try {
+      final groqService =
+          await GroqService().getTranslation(textController, _selectedLanguage);
+      textController.clear();
+      return groqService;
+    } catch (e) {
+      throw Exception('Erreur lors de la récupération des données: $e');
+    }
   }
 
+  Widget translationData() {
+    return FutureBuilder<dynamic>(
+      future: _messages.isNotEmpty ? getTranslationData() : null,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Skeleton();
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Erreur: ${snapshot.error}'),
+          );
+        } else if (snapshot.hasData) {
+          String content = snapshot.data["choices"][0]["message"]["content"];
+          String sender = snapshot.data["choices"][0]["message"]["role"];
+
+          _messages.add({
+            'content': content,
+            'sender': sender,
+          });
+
+          return messagesListView(_messages);
+        } else {
+          return _messages.isEmpty
+              ? const Text('Aucune donnée disponible')
+              : messagesListView(_messages);
+        }
+      },
+    );
+  }
+
+  Widget messagesListView(List<Map<String, String>> messages) {
+    return ListView.builder(
+      itemCount: messages.length,
+      itemBuilder: (context, index) {
+        final message = messages[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+          child: Align(
+            alignment: message['sender'] == 'assistant'
+                ? Alignment.centerRight
+                : Alignment.centerLeft,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              decoration: BoxDecoration(
+                color: message['sender'] == 'assistant'
+                    ? const Color.fromARGB(255, 0, 36, 65)
+                    : const Color.fromARGB(255, 221, 221, 221),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: ListTile(
+                title: Text(
+                  message['content'] ?? '',
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: message['sender'] == "assistant"
+                          ? Colors.white
+                          : const Color.fromARGB(255, 0, 0, 0)),
+                ),
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      message['sender'] ?? '',
+                      style: TextStyle(
+                          color: message['sender'] == "assistant"
+                              ? const Color.fromARGB(255, 206, 206, 206)
+                              : Colors.black),
+                    ),
+                    const Text(
+                      "12:25",
+                      style:
+                          TextStyle(color: Color.fromARGB(255, 206, 206, 206)),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       appBar: AppBar(
         title: const Text('TRANSLATE'),
         backgroundColor: const Color.fromARGB(255, 20, 48, 70),
@@ -32,13 +127,13 @@ class _MyTranslatePageState extends State<MyTranslatePage> {
       ),
       body: Column(
         children: [
-          const SizedBox(height: 20),//Espacement
-          languageDropdown(),//Liste de langues déroulante
-          Expanded(child: messagesListView()),//Pour que les messages soit entre (listLanguage et Zone de texte)
-          TextInputArea(),//Zone de texte (input de l'utilisateur)
+          const SizedBox(height: 20),
+          languageDropdown(),
+          Expanded(child: translationData()),
+          TextInputArea(),
         ],
       ),
-      bottomNavigationBar: navigationBar(),//Nav bar
+      bottomNavigationBar: const MyBottomNavigationBar(),
     );
   }
 
@@ -57,47 +152,17 @@ class _MyTranslatePageState extends State<MyTranslatePage> {
         ),
         icon: const Icon(Icons.language, color: Colors.blue),
         items: _languages.map((String language) {
-          return DropdownMenuItem<String>(//menu deroulant
+          return DropdownMenuItem<String>(
             value: language,
             child: Text(language),
           );
         }).toList(),
         onChanged: (String? newValue) {
           setState(() {
-            _selectedLanguage = newValue!;//pour que la langue selectionné soit enregistré
+            _selectedLanguage = newValue!;
           });
         },
       ),
-    );
-  }
-
-  Widget messagesListView() {
-    return ListView.builder(
-      itemCount: _messages.length,
-      itemBuilder: (context, index) {
-        final message = _messages[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
-          child: Align(
-            alignment: message['sender'] == 'user'
-                ? Alignment.centerRight//avoir les messages de l'utilisateur a droite
-                : Alignment.centerLeft,//"                                    " gauche
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: message['sender'] == 'user'
-                    ? Colors.blue.shade100//avoir les messages de l'utilisateur en bleu
-                    : Colors.green.shade100,// avoir les messages de l'IA en vert
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                message['text'] ?? '',
-                style: const TextStyle(fontSize: 16),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -109,9 +174,9 @@ class _MyTranslatePageState extends State<MyTranslatePage> {
         children: [
           Expanded(
             child: TextField(
-              controller: _textController,//pour récuperer la valeur de l'input
+              controller: textController,
               decoration: InputDecoration(
-                hintText: 'Le texte à traduire',
+                hintText: 'The text to be translated',
                 filled: true,
                 fillColor: Colors.grey.shade200,
                 border: OutlineInputBorder(
@@ -131,56 +196,17 @@ class _MyTranslatePageState extends State<MyTranslatePage> {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.send, color: Colors.blue),//a l'envoie
+            icon: const Icon(Icons.send, color: Colors.blue),
             onPressed: () {
-              if (_textController.text.isNotEmpty) {
+              if (textController.text.isNotEmpty) {
                 setState(() {
-                  //on met dans message (le message de l'utilisateur)
                   _messages.add({
-                    'text': _textController.text,
+                    'content': textController.text,
                     'sender': 'user',
                   });
-                  // la réponse de l'IA
-                  _messages.add({
-                    'text': 'La réponse de l\'IA pour "${_textController.text}"',
-                    'sender': 'ai',
-                  });
-                  _textController.clear();
-                  print(_messages);
                 });
               }
             },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget navigationBar() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Color.fromARGB(255, 20, 48, 70),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-      ),
-      child: BottomNavigationBar(
-        backgroundColor: Colors.transparent,
-        selectedItemColor: const Color.fromARGB(255, 1, 187, 243),
-        unselectedItemColor: Colors.white,
-        items: const [
-          BottomNavigationBarItem(
-            label: 'Translate',
-            icon: Icon(Icons.translate, size: 30, color: Colors.white),
-          ),
-          BottomNavigationBarItem(
-            label: 'Correction',
-            icon: Icon(Icons.edit, size: 30, color: Colors.white),
-          ),
-          BottomNavigationBarItem(
-            label: 'Rephraser',
-            icon: Icon(Icons.autorenew, size: 30, color: Colors.white),
           ),
         ],
       ),
