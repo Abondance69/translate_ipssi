@@ -1,34 +1,14 @@
-// ignore_for_file: library_private_types_in_public_api, file_names
 import 'package:flutter/material.dart';
-import 'package:translate_ipssi/pages/correction.dart';
 
-class MyBottomNavigationBar extends StatefulWidget {
-  const MyBottomNavigationBar({super.key});
+class MyBottomNavigationBar extends StatelessWidget {
+  final int currentIndex;
+  final Function(int) onTap;
 
-  @override
-  _MyBottomNavigationBarState createState() => _MyBottomNavigationBarState();
-}
-
-class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
-  int _selectedIndex = 0;
-
-  void navigationPage() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const CorrectionPage()),
-    );
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      print(_selectedIndex);
-
-      if (_selectedIndex == 1) {
-        navigationPage();
-      }
-    });
-  }
+  const MyBottomNavigationBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +24,8 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
         backgroundColor: Colors.transparent,
         selectedItemColor: const Color.fromARGB(255, 1, 187, 243),
         unselectedItemColor: Colors.white,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        currentIndex: currentIndex,
+        onTap: onTap,
         items: const [
           BottomNavigationBarItem(
             label: 'Translate',
