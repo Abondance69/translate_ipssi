@@ -24,7 +24,6 @@ class HomePageState extends State<HomePage> {
       _currentIndex = index;
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
