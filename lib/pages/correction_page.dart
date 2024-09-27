@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:translate_ipssi/services/groq.dart';
 import 'package:translate_ipssi/widgets/skeleton.dart';
 
-class MyTranslatePage extends StatefulWidget {
-  const MyTranslatePage({super.key});
+class CorrectionPage extends StatefulWidget {
+  const CorrectionPage({super.key});
 
   @override
-  State<MyTranslatePage> createState() => _MyTranslatePageState();
+  State<CorrectionPage> createState() => _CorrectionPageState();
 }
 
-class _MyTranslatePageState extends State<MyTranslatePage> {
+class _CorrectionPageState extends State<CorrectionPage> {
   final List<String> languages = [
     'Anglais',
     'Français',
@@ -24,22 +24,25 @@ class _MyTranslatePageState extends State<MyTranslatePage> {
   final TextEditingController textController = TextEditingController();
   bool isLoading = false;
 
-  Future<void> getTranslationData() async {
+  Future<void> getCorrectionData() async {
     setState(() {
       isLoading = true;
     });
 
     try {
       final groqService =
-          await GroqService().getTranslation(textController, selectedLanguage);
+          await GroqService().getCorrection(textController, selectedLanguage);
       String content = groqService["choices"][0]["message"]["content"];
-      String sender = "assistant";
+      String sender = groqService["choices"][0]["message"]["role"];
+      DateTime now = DateTime.now();
+      dynamic minutes = now.minute < 10 ? "0${now.minute}" : now.minute;
+      dynamic hour = now.hour + 2 < 10
+          ? "0${now.hour + 2}"
+          : now.hour + 2;
+      dynamic date = "$hour:$minutes";
 
       setState(() {
-        messages.add({
-          'content': content,
-          'sender': sender,
-        });
+        messages.add({'content': content, 'sender': sender, 'date': date});
         isLoading = false;
         textController.clear();
       });
@@ -92,11 +95,6 @@ class _MyTranslatePageState extends State<MyTranslatePage> {
                 subtitle: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    TextButton(
-                        onPressed: () {
-                          print(index);
-                        },
-                        child: const Text("Index")),
                     Text(
                       message['sender'] ?? '',
                       style: TextStyle(
@@ -104,11 +102,13 @@ class _MyTranslatePageState extends State<MyTranslatePage> {
                               ? const Color.fromARGB(255, 206, 206, 206)
                               : Colors.black),
                     ),
-                    const Text(
-                      "12:25",
-                      style:
-                          TextStyle(color: Color.fromARGB(255, 206, 206, 206)),
-                    )
+                    Text(
+                      message['date'] ?? "",
+                      style: TextStyle(
+                          color: message['sender'] == "assistant"
+                              ? const Color.fromARGB(255, 206, 206, 206)
+                              : Colors.black),
+                    ),
                   ],
                 ),
               ),
@@ -123,7 +123,7 @@ class _MyTranslatePageState extends State<MyTranslatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Translate'),
+        title: const Text('Correction'),
         backgroundColor: const Color.fromARGB(255, 20, 48, 70),
         foregroundColor: Colors.white,
       ),
@@ -196,7 +196,7 @@ class _MyTranslatePageState extends State<MyTranslatePage> {
               cursorColor: const Color.fromARGB(255, 0, 35, 91),
               controller: textController,
               decoration: InputDecoration(
-                hintText: 'Texte à traduire',
+                hintText: 'Texte à corriger',
                 filled: true,
                 fillColor: Colors.grey.shade200,
                 border: OutlineInputBorder(
@@ -226,11 +226,20 @@ class _MyTranslatePageState extends State<MyTranslatePage> {
             onPressed: () {
               if (textController.text.isNotEmpty) {
                 setState(() {
+                  DateTime now = DateTime.now();
+                  dynamic minutes =
+                      now.minute < 10 ? "0${now.minute}" : now.minute;
+                  dynamic hour = now.hour + 2 < 10
+                      ? "0${now.hour + 2}"
+                      : now.hour + 2; // j'ai mis +2 pour etre dans UTC+2 locale
+                  dynamic date = "$hour:$minutes";
+
                   messages.add({
                     'content': textController.text,
                     'sender': 'user',
+                    'date': date
                   });
-                  getTranslationData();
+                  getCorrectionData();
                 });
               }
             },
