@@ -1,16 +1,17 @@
-# translate_ipssi
+**1.Développeurs**
+Abondance KAZADI : IPSSI 3e Dev
+Nahida HAMHAMI : IPSSI 3e Dev
 
-A new Flutter project.
 
-## Getting Started
+**2. Installation des packages**
+Pour installer les bibliothèques déjà définies dans ton projet Flutter, il te suffit d'exécuter la commande suivante dans le terminal à la racine de ton proje
+```dart
+flutter pub get
+```
+Pour ce projet j'ai utilisé :
 
-This project is a starting point for a Flutter application.
+- http : Le package http dans Flutter est utilisé pour envoyer des requêtes HTTP depuis une application Flutter vers un serveur. Il permet d'envoyer des requêtes GET, POST, PUT, DELETE, etc.
+- sharepreferencies : Le package shared_preferences dans Flutter permet de stocker des données localement dans l'application sous forme de paires clé-valeur. 
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+**3. Temps de réalisation**
+Le développement nous a pris deux journées entières, la prochaine fois nous le ferons en un 4heures&#128516;.
