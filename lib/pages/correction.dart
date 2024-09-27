@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:translate_ipssi/widgets/navigationBar.dart';
 
 class CorrectionPage extends StatelessWidget {
   const CorrectionPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text("Page de correction"),),
-      bottomNavigationBar: MyBottomNavigationBar(),
+    return Scaffold(
+       appBar: AppBar(
+        title: const Text('Correction'),
+        backgroundColor: const Color.fromARGB(255, 20, 48, 70),
+        foregroundColor: Colors.white,
+      ),
+      body: const Center(child: Text("Page de correction"),),
     );
   }
 }
