@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:translate_ipssi/pages/translate.dart';
-import 'package:translate_ipssi/pages/correction.dart';
-import 'package:translate_ipssi/widgets/navigationBar.dart';
+import 'package:translate_ipssi/pages/chat_page.dart';
+import 'package:translate_ipssi/pages/translate_page.dart';
+import 'package:translate_ipssi/pages/correction_page.dart';
+import 'package:translate_ipssi/widgets/navigation_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,7 +17,7 @@ class HomePageState extends State<HomePage> {
   final List<Widget> _pages = [
     const MyTranslatePage(),
     const CorrectionPage(),
-    const Center(child: Text('Chat Page')),
+    const ChatPage()
   ];
 
   void _updateIndex(int index) {
@@ -24,7 +25,6 @@ class HomePageState extends State<HomePage> {
       _currentIndex = index;
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
