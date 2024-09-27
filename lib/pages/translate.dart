@@ -92,6 +92,11 @@ class _MyTranslatePageState extends State<MyTranslatePage> {
                 subtitle: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    TextButton(
+                        onPressed: () {
+                          print(index);
+                        },
+                        child: const Text("Index")),
                     Text(
                       message['sender'] ?? '',
                       style: TextStyle(
@@ -199,7 +204,8 @@ class _MyTranslatePageState extends State<MyTranslatePage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
-                    borderSide: const BorderSide(color: Color.fromARGB(255, 0, 35, 96))),
+                    borderSide: const BorderSide(
+                        color: Color.fromARGB(255, 0, 35, 96))),
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 10,
                   horizontal: 20,
